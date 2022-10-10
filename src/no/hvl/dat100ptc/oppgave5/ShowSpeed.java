@@ -12,8 +12,8 @@ import no.hvl.dat100ptc.oppgave4.GPSComputer;
 
 public class ShowSpeed extends EasyGraphics {
 			
-	private static final int MARGIN = 50;
-	private static final int BARHEIGHT = 200; // assume no speed above 200 km/t
+	private static final int MARGIN = 20;
+	private static final int BARHEIGHT = 200; // assume no speed above 100 km/t
 
 	private GPSComputer gpscomputer;
 	private GPSPoint[] gpspoints;
@@ -34,24 +34,27 @@ public class ShowSpeed extends EasyGraphics {
 
 	public void run() {
 
-		int N = gpspoints.length-1; // number of data points
+		int N = gpspoints.length - 1; // number of data points
 		
-		makeWindow("Speed profile", 2*MARGIN + 2 * N, 2 * MARGIN + BARHEIGHT);
+		makeWindow("Speed profile", 2 * MARGIN + 4 * N, 2 * MARGIN + BARHEIGHT);
 		
-		showSpeedProfile(MARGIN + BARHEIGHT,N);
+		showSpeedProfile(MARGIN + BARHEIGHT, N);
 	}
 	
 	public void showSpeedProfile(int ybase, int N) {
 
 		// get segments speeds from the GPS computer object		
 		double[] speeds = gpscomputer.speeds();
+		int x = MARGIN - 3;
 
-		int x = MARGIN,y;
-
-		// TODO - START
+		for (int i = 0; i < N; i++) {
+			int speed = (int)Math.round(speeds[i]);
+			fillRectangle(x += 4, ybase - 2 * speed, 3, 2 * speed);
+		}
 		
-		throw new UnsupportedOperationException(TODO.method());
-	
-		// TODO - SLUTT
+		int avg = (int)Math.round(gpscomputer.averageSpeed() * 2);
+		setColor(0, 255, 0);
+		drawLine(MARGIN, ybase - avg, x + 4, ybase - avg);
+		
 	}
 }

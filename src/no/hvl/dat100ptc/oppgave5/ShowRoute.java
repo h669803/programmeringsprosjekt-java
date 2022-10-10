@@ -10,12 +10,14 @@ import no.hvl.dat100ptc.oppgave4.GPSComputer;
 
 public class ShowRoute extends EasyGraphics {
 
-	private static int MARGIN = 50;
-	private static int MAPXSIZE = 800;
+	private static int MARGIN = 20;
+	private static int MAPXSIZE = 1600;
 	private static int MAPYSIZE = 800;
 
 	private GPSPoint[] gpspoints;
 	private GPSComputer gpscomputer;
+	private double[] longitudes;
+	private double[] latitudes;
 	
 	public ShowRoute() {
 
@@ -23,6 +25,8 @@ public class ShowRoute extends EasyGraphics {
 		gpscomputer = new GPSComputer(filename);
 
 		gpspoints = gpscomputer.getGPSPoints();
+		latitudes = GPSUtils.getLatitudes(gpspoints);
+		longitudes = GPSUtils.getLongitudes(gpspoints);
 
 	}
 
@@ -42,48 +46,56 @@ public class ShowRoute extends EasyGraphics {
 	// antall x-pixels per lengdegrad
 	public double xstep() {
 
-		double maxlon = GPSUtils.findMax(GPSUtils.getLongitudes(gpspoints));
-		double minlon = GPSUtils.findMin(GPSUtils.getLongitudes(gpspoints));
+		double[] minmax = GPSUtils.findMinMax(longitudes);
 
-		double xstep = MAPXSIZE / (Math.abs(maxlon - minlon)); 
-
-		return xstep;
+		return MAPXSIZE / (minmax[1] - minmax[0]); 
+		
 	}
 
 	// antall y-pixels per breddegrad
 	public double ystep() {
 	
-		double ystep;
-		
-		// TODO - START
-		
-		throw new UnsupportedOperationException(TODO.method());
-
-		// TODO - SLUTT
+		double[] minmax = GPSUtils.findMinMax(latitudes);
+		println(minmax[0] + ", " + minmax[1]);
+		return MAPYSIZE / (minmax[1] - minmax[0]);
 		
 	}
 
 	public void showRouteMap(int ybase) {
 
-		// TODO - START
+		double scale = Math.min(ystep(), xstep()),
+		minlat = GPSUtils.findMin(latitudes),
+		minlong = GPSUtils.findMin(longitudes);
 		
-		throw new UnsupportedOperationException(TODO.method());
+		int x = 0, y = 0;
 		
-		// TODO - SLUTT
+		setColor(0, 255, 0);
+		for (int i = 0; i < gpspoints.length; i++) {
+			
+			int newx = MARGIN + (int)Math.round((longitudes[i] - minlong) * scale);
+			int newy = ybase - (int)Math.round((latitudes[i] - minlat) * scale);
+			
+			if (i > 0) 
+				drawLine(x, y, newx, newy);
+			
+			fillCircle(x = newx, y = newy, 4);
+			
+		}
+		
 	}
-
+	
 	public void showStatistics() {
 
-		int TEXTDISTANCE = 20;
+		String[] text = gpscomputer.getFormatedStatistics();
 
-		setColor(0,0,0);
-		setFont("Courier",12);
+		setColor(0, 0, 0);
+		setFont("Consolas", 16);
+		int y = MARGIN;
 		
-		// TODO - START
+		for (String str : text) {
+			drawString(str, MARGIN, y += 20);
+		}
 		
-		throw new UnsupportedOperationException(TODO.method());
-		
-		// TODO - SLUTT;
 	}
 
 }
