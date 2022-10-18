@@ -22,23 +22,20 @@ public class GPSComputer {
 	}
 	
 	public GPSPoint[] getGPSPoints() {
-		return this.gpspoints;
+		return gpspoints;
 	}
 	
-	// beregn total distances (i meter)
 	public double totalDistance() {
 
 		double distance = 0;
 		
-		for (int i = 1; i < gpspoints.length; i++) {
+		for (int i = 1; i < gpspoints.length; i++)
 			distance += GPSUtils.distance(gpspoints[i - 1], gpspoints[i]);
-		}
 		
 		return distance;
 
 	}
 
-	// beregn totale høydemeter (i meter)
 	public double totalElevation() {
 
 		double elevation = 0;
@@ -50,15 +47,12 @@ public class GPSComputer {
 
 	}
 
-	// beregn total tiden for hele turen (i sekunder)
 	public int totalTime() {
 		
 		// antar punktene er sortert etter tid
 		return gpspoints[gpspoints.length - 1].getTime() - gpspoints[0].getTime();
 
 	}
-		
-	// beregn gjennomsnitshastighets mellom hver av gps punktene
 
 	public double[] speeds() {
 		
@@ -83,8 +77,28 @@ public class GPSComputer {
 		return totalDistance() / totalTime() * 3.6;
 		
 	}
+	
+	// Oppgave 6a
+	public double[] climbs() {
+		
+		int l = gpspoints.length - 1;
+		double[] climbs = new double[l];
+		
+		for (int i = 0; i < l; i++) {
+			double deltaElev = gpspoints[i + 1].getElevation() - gpspoints[i].getElevation();
+			climbs[i] = deltaElev / GPSUtils.distance(gpspoints[i], gpspoints[i + 1]);
+		}
+		
+		return climbs;
+		
+	}
+	
+	public double maxClimb() {
+		
+		return GPSUtils.findMax(climbs());
+		
+	}
 
-	// beregn kcal gitt weight og tid der kjøres med en gitt hastighet
 	public double kcal(double weight, int secs, double speed) {
 
 		double met = 16;		
@@ -115,31 +129,47 @@ public class GPSComputer {
 		
 	}
 	
-	private static double WEIGHT = 80.0;
-	private static String[] labels = new String[] {
+	private static double WEIGHT = 80;
+	private static String[] labels = {
 		"Total distance", "Total elevation", "Max speed", "Average speed", "Energy"
 	};
-	private static String[] units = new String[] {
+	private static String[] units = {
 		"km", "m", "km/t", "km/t", "kcal"	
 	};
 	
-	private double[] getStatistics() {
-		return new double[] {
+	public String[] getFormatedStatistics() {
+		
+		double[] statistics = {
 			totalDistance() / 1000,
 			totalElevation(),
 			maxSpeed(),
 			averageSpeed(),
 			totalKcal(WEIGHT)
 		};
-	}
-	
-	public String[] getFormatedStatistics() {
-		
-		double[] statistics = getStatistics();
 		String[] result = new String[6];
 		result[0] = "Total time      :" + GPSUtils.formatTime(totalTime());
 		for (int i = 0; i < 5; i++) {
 			result[i + 1] = String.format(Locale.US, "%-16s:%10.2f %s", labels[i], statistics[i], units[i]);
+		}
+		return result;
+		
+	}
+	
+	public double getWeight() {
+		return WEIGHT;
+	}
+	
+	public String formatStat(String label, double stat, String unit) {
+		return String.format(Locale.US, "%-16s:%10.2f %s", label, stat, unit);
+	}
+	
+	public String[] getFormatedStatistics(int time, double distance, double elevation, double maxSpeed, double avgSpeed, double energy) {
+		
+		double[] statistics = {distance, elevation, maxSpeed, avgSpeed, energy};
+		String[] result = new String[6];
+		result[0] = "Total time      :" + GPSUtils.formatTime(time);
+		for (int i = 0; i < 5; i++) {
+			result[i + 1] = formatStat(labels[i], statistics[i], units[i]);
 		}
 		return result;
 		

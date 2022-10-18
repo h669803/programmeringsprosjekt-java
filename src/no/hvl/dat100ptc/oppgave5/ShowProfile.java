@@ -17,6 +17,7 @@ public class ShowProfile extends EasyGraphics {
 	private static int MAXBARHEIGHT = 500; // assume no height above 500 meters
 	
 	private GPSPoint[] gpspoints;
+	private int timeScale;
 
 	public ShowProfile() {
 
@@ -36,6 +37,8 @@ public class ShowProfile extends EasyGraphics {
 		int N = gpspoints.length; // number of data points
 
 		makeWindow("Height profile", 2 * MARGIN + 4 * N, 2 * MARGIN + MAXBARHEIGHT);
+		
+		timeScale = Integer.parseInt(getText("Tidsskalering"));
 
 		// top margin + height of drawing area
 		showHeightProfile(MARGIN + MAXBARHEIGHT);
@@ -49,6 +52,8 @@ public class ShowProfile extends EasyGraphics {
 		
 		for (int i = 0; i < gpspoints.length; i++) {
 			int elevation = (int)Math.round(gpspoints[i].getElevation());
+			if (i > 0)
+				pause((gpspoints[i].getTime() - gpspoints[i - 1].getTime()) * 1000 / timeScale);
 			fillRectangle(x += 4, ybase - elevation, 3, Math.max(elevation, 0));
 		}
 

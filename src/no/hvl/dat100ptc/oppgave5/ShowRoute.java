@@ -56,7 +56,7 @@ public class ShowRoute extends EasyGraphics {
 	public double ystep() {
 	
 		double[] minmax = GPSUtils.findMinMax(latitudes);
-		println(minmax[0] + ", " + minmax[1]);
+		
 		return MAPYSIZE / (minmax[1] - minmax[0]);
 		
 	}
